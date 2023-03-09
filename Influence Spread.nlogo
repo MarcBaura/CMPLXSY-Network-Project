@@ -16,20 +16,29 @@ influencers-own [
 to setup
   clear-all
   ; shape used to differentiate agent type
-  set-default-shape influencers "circle"
-  set-default-shape audiences "square"
+  set-default-shape influencers "person"
+  set-default-shape audiences "person"
 
   ask patches [set pcolor 29]
 
-  create-influencers 3 [
-    set message random 2
-    ifelse message = 1 [set color cyan] [set color lime]
+  create-influencers number_of_influencers [
+    set message random 3
+    (ifelse ; cyan = social media, lime = f2f, red = mixed
+    message = 0 [
+      set color cyan
+    ]
+    message = 1 [
+      set color lime
+    ]
+    message = 2 [
+      set color red
+    ])
     set size 2
     setxy round(random-xcor) round(random-ycor)
     rt random 360
   ]
 
-  create-audiences 3 [
+  create-audiences number_of_audiences [
     set size 2
     set color black
     setxy round(random-xcor) round(random-ycor)
@@ -84,26 +93,26 @@ to-report coin-flip?
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+498
 10
-647
-448
+910
+423
 -1
 -1
-13.0
+6.22
 1
 10
 1
 1
 1
 0
+0
+0
 1
-1
-1
--16
-16
--16
-16
+-32
+32
+-32
+32
 0
 0
 1
@@ -143,6 +152,58 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+19
+101
+191
+134
+number_of_influencers
+number_of_influencers
+1
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+19
+144
+191
+177
+number_of_audiences
+number_of_audiences
+1
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+926
+12
+1068
+57
+NIL
+number_of_influencers
+2
+1
+11
+
+MONITOR
+1072
+12
+1211
+57
+NIL
+number_of_audiences
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
