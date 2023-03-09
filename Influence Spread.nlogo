@@ -1,6 +1,87 @@
+; should we add more breeds per medium? e.g., f2f-influencers, mixed-influencers, etc...
 breed [influencers influencer]
+; same with audiences?
 breed [audiences audience]
 
+audiences-own [
+  agree-level
+  disagree-level
+]
+
+influencers-own [
+  message ; 1 for Agree || 0 for Disagree
+  medium  ; 1 for f2f   || 0 for social media  ||  2 for mixed
+]
+
+to setup
+  clear-all
+  ; shape used to differentiate agent type
+  set-default-shape influencers "circle"
+  set-default-shape audiences "square"
+
+  ask patches [set pcolor 29]
+
+  create-influencers 3 [
+    set message random 2
+    ifelse message = 1 [set color cyan] [set color lime]
+    set size 2
+    setxy round(random-xcor) round(random-ycor)
+    rt random 360
+  ]
+
+  create-audiences 3 [
+    set size 2
+    set color black
+    setxy round(random-xcor) round(random-ycor)
+    rt random 360
+  ]
+
+
+  reset-ticks
+end
+
+to go
+  tick
+end
+
+to update-colors
+  ask audiences [
+    (ifelse
+      (agree-level > disagree-level) [set color cyan]
+      (disagree-level > agree-level) [set color lime]
+      [set color black])
+  ]
+end
+
+to update-roles
+  ask audiences [
+    (ifelse agree-level >= 100 [
+      ifelse coin-flip? = 0 [
+        become-influencer
+        set message 1
+      ] [die]
+    ]
+      disagree-level >= 100 [
+        ifelse coin-flip? = 0 [
+          become-influencer
+          set message 0
+        ] [die]
+      ]
+    )
+  ]
+end
+
+to become-influencer
+  set breed influencers
+  let choice random 3
+  set medium choice
+end
+
+
+
+to-report coin-flip?
+  report random 2 = 0
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -30,10 +111,10 @@ ticks
 30.0
 
 BUTTON
-48
-62
-111
-95
+29
+52
+92
+85
 NIL
 setup
 NIL
@@ -47,10 +128,10 @@ NIL
 1
 
 BUTTON
-89
-228
-152
-261
+116
+53
+179
+86
 NIL
 go
 NIL
