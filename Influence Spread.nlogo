@@ -21,21 +21,19 @@ to setup
 
   ask patches [set pcolor 29]
 
-  create-influencers number_of_influencers [
-    set message random 3
-    (ifelse ; cyan = social media, lime = f2f, red = mixed
-    message = 0 [
-      set color cyan
-    ]
-    message = 1 [
-      set color lime
-    ]
-    message = 2 [
-      set color red
-    ])
-    set size 2
-    setxy round(random-xcor) round(random-ycor)
-    rt random 360
+  create-influencers social_media_influencers [
+    set color cyan
+    set_turtle_color_position
+  ]
+
+  create-influencers f2f_influencers [
+    set color lime
+    set_turtle_color_position
+  ]
+
+  create-influencers mixed_influencers [
+    set color red
+    set_turtle_color_position
   ]
 
   create-audiences number_of_audiences [
@@ -45,12 +43,30 @@ to setup
     rt random 360
   ]
 
+  ask influencers with [color = cyan or color = red] [
+    create-links-with n-of random max_social_media_friends other audiences with [color = black]
+  ]
 
+  resize-turtles
   reset-ticks
 end
 
 to go
+  resize-turtles
   tick
+end
+
+to resize-turtles
+  ask influencers with [color = cyan or color = red]
+  [
+    set size sqrt count link-neighbors
+  ]
+end
+
+to set_turtle_color_position
+  set size 2
+  setxy round(random-xcor) round(random-ycor)
+  rt random 360
 end
 
 to update-colors
@@ -93,9 +109,9 @@ to-report coin-flip?
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-498
+200
 10
-910
+612
 423
 -1
 -1
@@ -143,7 +159,7 @@ BUTTON
 86
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -154,12 +170,12 @@ NIL
 1
 
 SLIDER
-19
-101
-191
-134
-number_of_influencers
-number_of_influencers
+20
+95
+193
+128
+social_media_influencers
+social_media_influencers
 1
 100
 50.0
@@ -169,10 +185,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-19
-144
-191
-177
+20
+201
+192
+234
 number_of_audiences
 number_of_audiences
 1
@@ -184,26 +200,113 @@ NIL
 HORIZONTAL
 
 MONITOR
-926
-12
-1068
-57
-NIL
-number_of_influencers
-2
-1
-11
-
-MONITOR
-1072
-12
-1211
-57
+771
+60
+910
+105
 NIL
 number_of_audiences
 2
 1
 11
+
+SLIDER
+20
+236
+192
+269
+max_social_media_friends
+max_social_media_friends
+0
+100
+15.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+623
+11
+765
+56
+social_media_influencers
+count influencers with [color = cyan]
+17
+1
+11
+
+MONITOR
+770
+10
+908
+55
+mixed_influencers
+count influencers with [color = red]
+17
+1
+11
+
+MONITOR
+623
+61
+766
+106
+f2f_influencers
+count influencers with [color = lime]
+17
+1
+11
+
+SLIDER
+20
+129
+192
+162
+f2f_influencers
+f2f_influencers
+0
+100
+75.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+20
+165
+192
+198
+mixed_influencers
+mixed_influencers
+0
+100
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+623
+110
+912
+317
+count_each_influencers
+Count
+Steps
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"social_media" 1.0 0 -11221820 true "" "plot count influencers with [color = cyan]"
+"f2f" 1.0 0 -13840069 true "" "plot count influencers with [color = lime]"
+"mixed" 1.0 0 -2674135 true "" "plot count influencers with [color = red]"
 
 @#$#@#$#@
 ## WHAT IS IT?
