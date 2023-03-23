@@ -9,9 +9,16 @@ audiences-own [
 ]
 
 influencers-own [
+  temp ; for finding link
+  templinks ;
   message ; 1 for Agree || 0 for Disagree
   medium  ; 1 for f2f   || 0 for social media  ||  2 for mixed
 ]
+
+; start out as audience
+; random first (slider var link-chance)
+; barabasi on all
+; start of influence
 
 to setup
   clear-all
@@ -21,46 +28,91 @@ to setup
 
   ask patches [set pcolor 29]
 
+  ; Message | 0 -> cyan | 1 -> lime
+
   create-influencers social_media_influencers [
     set color cyan
+    set message 1
+    set medium 0
+    set_turtle_color_position
+  ]
+
+  create-influencers f2f_influencers [
+    set color cyan
+    set message 1
+    set medium 1
+    set_turtle_color_position
+  ]
+
+  create-influencers mixed_influencers [
+    set color cyan
+    set message 1
+    set medium 2
+    set_turtle_color_position
+  ]
+
+  create-influencers social_media_influencers [
+    set color lime
+    set message 0
+    set medium 0
     set_turtle_color_position
   ]
 
   create-influencers f2f_influencers [
     set color lime
+    set message 0
+    set medium 1
     set_turtle_color_position
   ]
 
   create-influencers mixed_influencers [
-    set color red
+    set color lime
+    set message 0
+    set medium 2
     set_turtle_color_position
   ]
 
   create-audiences number_of_audiences [
     set size 2
-    set color black
+    set color white
     setxy round(random-xcor) round(random-ycor)
     rt random 360
   ]
 
-  ask influencers with [color = cyan or color = red] [
-    create-links-with n-of random max_social_media_friends other audiences with [color = black]
+  ask influencers with [medium = 0] [
+    set label "Social Media"
+    set label-color black
   ]
 
-  resize-turtles
+  ask influencers with [medium = 1] [
+    set label "F2f"
+    set label-color black
+  ]
+
+  ask influencers with [medium = 2] [
+    set label "Mixed"
+    set label-color black
+  ]
+
+  ask influencers with [color = cyan] [
+    create-links-with other influencers with [color = cyan] [
+      set color cyan
+    ]
+  ]
+
+  ask influencers with [color = lime] [
+    create-links-with other influencers with [color = lime] [
+      set color lime
+    ]
+  ]
+
   reset-ticks
 end
 
 to go
-  resize-turtles
-  tick
-end
 
-to resize-turtles
-  ask influencers with [color = cyan or color = red]
-  [
-    set size sqrt count link-neighbors
-  ]
+  barabasi
+  tick
 end
 
 to set_turtle_color_position
@@ -96,6 +148,37 @@ to update-roles
   ]
 end
 
+
+;
+to barabasi
+  ask audiences [
+   set temp -1
+   set templinks count my-links
+    ask audiences with [temp != -1] [
+      if random 100 <= (templinks)/(count links * 2) * 100 [
+        create-links-with influencers with [temp = -1] [
+          set color cyan
+        ]
+      ]
+   ]
+
+   set temp 0
+  ]
+
+  ask influencers with [medium = 0 and message = 1] [
+   set temp -1
+
+    ask audiences [
+      if random 100 <= (count my-links)/(count links * 2) * 100 [
+        create-links-with influencers with [temp = -1] [
+          set color lime
+        ]
+      ]
+   ]
+   set temp 0
+  ]
+end
+
 to become-influencer
   set breed influencers
   let choice random 3
@@ -107,12 +190,16 @@ end
 to-report coin-flip?
   report random 2 = 0
 end
+
+to social-media-broadcast
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-200
-10
-612
-423
+199
+18
+611
+431
 -1
 -1
 6.22
@@ -159,7 +246,7 @@ BUTTON
 86
 NIL
 go
-T
+NIL
 1
 T
 OBSERVER
@@ -178,7 +265,7 @@ social_media_influencers
 social_media_influencers
 1
 100
-50.0
+4.0
 1
 1
 NIL
@@ -267,7 +354,7 @@ f2f_influencers
 f2f_influencers
 0
 100
-75.0
+5.0
 1
 1
 NIL
@@ -282,7 +369,7 @@ mixed_influencers
 mixed_influencers
 0
 100
-30.0
+3.0
 1
 1
 NIL
@@ -307,6 +394,36 @@ PENS
 "social_media" 1.0 0 -11221820 true "" "plot count influencers with [color = cyan]"
 "f2f" 1.0 0 -13840069 true "" "plot count influencers with [color = lime]"
 "mixed" 1.0 0 -2674135 true "" "plot count influencers with [color = red]"
+
+SLIDER
+33
+318
+205
+351
+movement-speed
+movement-speed
+0
+100
+49.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+25
+361
+197
+394
+link-chance
+link-chance
+1
+100
+62.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
