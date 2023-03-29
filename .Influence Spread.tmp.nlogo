@@ -63,8 +63,8 @@ to setup
    set templinks count my-links
    ask audiences with [temp != -1] [
       if random 100 <= (templinks)/(count links) * 100 [
-        create-links-with audiences with [temp = -1] [
-          set color black
+        create-links-with influencers with [temp = -1] [
+          set color
         ]
      ]
    ]
