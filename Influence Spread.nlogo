@@ -15,7 +15,7 @@ influencers-own [
   temp ; for finding link
   templinks ;
   message ; 1 for Agree || 0 for Disagree
-  medium  ; 1 for f2f   || 0 for social media  ||  2 for mixed
+  medium  ; 2 for mixed || 1 for f2f   || 0 for social media
 ]
 
 ; start out as audience
@@ -40,7 +40,6 @@ to setup
     rt random 360
   ]
 
-
   ask audiences [
     set temp -1
 
@@ -57,7 +56,20 @@ to setup
     set temp 0
   ]
 
-  ;barabasi
+  barabasi
+  become-influencer
+  reset-ticks
+end
+
+to go
+  if not any? audiences [stop]
+  move-audience
+  influence
+  remove-audience
+  tick
+end
+
+to barabasi
   ask audiences [
    set temp -1
    set templinks count my-links
@@ -71,16 +83,7 @@ to setup
 
    set temp 0
   ]
-
-  reset-ticks
 end
-
-to go
-
-  barabasi
-  tick
-end
-
 to set_turtle_color_position
   set size 2
   setxy round(random-xcor) round(random-ycor)
@@ -114,63 +117,93 @@ to update-roles
   ]
 end
 
-
-;
-to barabasi
-  ask audiences [
-   set temp -1
-   set templinks count my-links
-    ask audiences with [temp != -1] [
-      if random 100 <= (templinks)/(count links * 2) * 100 [
-        create-links-with influencers with [temp = -1] [
-          set color cyan
-        ]
-      ]
-   ]
-
-   set temp 0
-  ]
-
-  ask influencers with [medium = 0 and message = 1] [
-   set temp -1
-
-    ask audiences [
-      if random 100 <= (count my-links)/(count links * 2) * 100 [
-        create-links-with influencers with [temp = -1] [
-          set color lime
-        ]
-      ]
-   ]
-   set temp 0
-  ]
-end
-
 to become-influencer
-  set breed influencers
-  let choice random 3
-  set medium choice
+  let currentCount 0
+  let social max-n-of (social_media_influencers * 2) audiences [count my-links]
+  ask social [
+    set breed influencers
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+    set medium 0
+    set label medium
+    set currentCount currentCount + 1
+  ]
+  let mixed max-n-of (mixed_influencers * 2) audiences [count my-links]
+  set currentCount 0
+  ask mixed [
+    set breed influencers
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+    set medium 2
+    set label medium
+    set currentCount currentCount + 1
+  ]
+  set currentCount 0
+  ask n-of (f2f_influencers * 2) audiences [
+    set breed influencers
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+    set medium 1
+    set label medium
+    set currentCount currentCount + 1
+  ]
 end
 
+to move-audience
+  ask audiences [
+    rt random 360
+    fd 5
+  ]
+end
 
+to influence
+  let f2f_movement 5
+  ask influencers with [medium = 2 or medium = 0 and message = 1] [
+    ask link-neighbors with [breed = audiences] [
+      set agree-level agree-level + 12.75
+    ]
+  ]
+  ask influencers with [medium = 2 or medium = 0 and message = 0] [
+    ask link-neighbors with [breed = audiences] [
+      set disagree-level disagree-level + 12.75
+    ]
+  ]
+  ask influencers with [medium = 1 or medium = 2 and message = 1][
+    rt random 360
+    fd 5
+    ask audiences in-radius 20 [
+      set agree-level agree-level + 25.5
+    ]
+  ]
+  ask influencers with [medium = 1 or medium = 2 and message = 0][
+    rt random 360
+    fd 5
+    ask audiences in-radius 20 [
+      set disagree-level disagree-level + 25.5
+    ]
+  ]
+  ask audiences [
+    ifelse ticks = 0 [set color white] [
+    let level agree-level - disagree-level + 100
+      set color scale-color green level 0 510 ]
+  ]
+end
+
+to remove-audience
+  ask audiences with [agree-level >= 255 or disagree-level >= 255] [die]
+end
 
 to-report coin-flip?
   report random 2 = 0
-end
-
-to social-media-broadcast
-
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 199
 18
-611
-431
+774
+594
 -1
 -1
-6.22
+8.7231
 1
-10
+20
 1
 1
 1
@@ -212,7 +245,7 @@ BUTTON
 86
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -223,13 +256,13 @@ NIL
 1
 
 SLIDER
-20
+19
 95
-193
+192
 128
 social_media_influencers
 social_media_influencers
-1
+0
 100
 5.0
 1
@@ -253,10 +286,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-771
-60
-910
-105
+931
+69
+1070
+114
 NIL
 number_of_audiences
 2
@@ -279,10 +312,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-623
-11
-765
-56
+783
+20
+925
+65
 social_media_influencers
 count influencers with [color = cyan]
 17
@@ -290,10 +323,10 @@ count influencers with [color = cyan]
 11
 
 MONITOR
-770
-10
-908
-55
+930
+19
+1068
+64
 mixed_influencers
 count influencers with [color = red]
 17
@@ -301,10 +334,10 @@ count influencers with [color = red]
 11
 
 MONITOR
-623
-61
-766
-106
+783
+70
+926
+115
 f2f_influencers
 count influencers with [color = lime]
 17
@@ -318,7 +351,7 @@ SLIDER
 162
 f2f_influencers
 f2f_influencers
-0
+1
 100
 5.0
 1
@@ -335,17 +368,17 @@ mixed_influencers
 mixed_influencers
 0
 100
-3.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-623
-110
-912
-317
+783
+119
+1072
+326
 count_each_influencers
 Count
 Steps
@@ -362,10 +395,10 @@ PENS
 "mixed" 1.0 0 -2674135 true "" "plot count influencers with [color = red]"
 
 SLIDER
-33
-318
-205
-351
+20
+271
+192
+304
 movement-speed
 movement-speed
 0
@@ -377,10 +410,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-25
-361
-197
-394
+20
+308
+192
+341
 link-chance
 link-chance
 1
@@ -392,25 +425,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-108
-422
-280
-455
+20
+343
+192
+376
 Starting_Population
 Starting_Population
 0
-100
-20.0
+1000
+1000.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-177
-523
-349
-556
+20
+379
+192
+412
 link_chance
 link_chance
 0
