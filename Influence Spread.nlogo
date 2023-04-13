@@ -9,6 +9,9 @@ audiences-own [
   stored
   agree-level
   disagree-level
+  agree-threshold
+  disagree-threshold
+  nearby
 ]
 
 influencers-own [
@@ -40,7 +43,7 @@ to setup
     rt random 360
   ]
 
-  ask audiences [
+  ask one-of audiences [
     set temp -1
 
     ask audiences with [temp != -1] [
@@ -48,7 +51,7 @@ to setup
       output-print stored
       if stored < link_chance [
         create-links-with audiences with [temp = -1] [
-          set color cyan
+          set color [0 0 255 25]
         ]
       ]
     ]
@@ -58,6 +61,13 @@ to setup
 
   barabasi
   become-influencer
+
+  ask audiences [
+    let tempthreshold random 51 + 50
+
+    set agree-threshold tempthreshold
+    set disagree-threshold tempthreshold
+  ]
   reset-ticks
 end
 
@@ -66,6 +76,13 @@ to go
   move-audience
   influence
   remove-audience
+
+  ask audiences [
+    set nearby count audiences in-radius 20
+  ]
+
+  wait 0.03
+
   tick
 end
 
@@ -73,10 +90,10 @@ to barabasi
   ask audiences [
    set temp -1
    set templinks count my-links
-   ask audiences with [temp != -1] [
+    ask audiences with [temp != -1 and templinks > 0] [
       if random 100 <= (templinks)/(count links) * 100 [
         create-links-with audiences with [temp = -1] [
-          set color black
+          set color [0 0 255 30]
         ]
      ]
    ]
@@ -144,45 +161,104 @@ to become-influencer
     set label medium
     set currentCount currentCount + 1
   ]
+
+
 end
 
 to move-audience
   ask audiences [
     rt random 360
-    fd 5
+    fd 1
   ]
 end
 
 to influence
   let f2f_movement 5
-  ask influencers with [medium = 2 or medium = 0 and message = 1] [
-    ask link-neighbors with [breed = audiences] [
-      set agree-level agree-level + 12.75
+
+  ; Broadcast every 10 ticks
+  if (ticks mod 10 = 0) [
+    ask influencers with [medium = 2 or medium = 0 and message = 1] [
+      set templinks count my-links
+      ask link-neighbors with [breed = audiences] [
+        if (random 101 < influence_chance) [
+          set agree-level agree-level + ((random 5 + 1) * templinks) ; Random val from 1-10 * Degree
+        ]
+      ]
     ]
   ]
-  ask influencers with [medium = 2 or medium = 0 and message = 0] [
-    ask link-neighbors with [breed = audiences] [
-      set disagree-level disagree-level + 12.75
+
+  if (ticks mod 10 = 0) [
+    ask influencers with [medium = 2 or medium = 0 and message = 0] [
+      ask link-neighbors with [breed = audiences] [
+        if (random 101 < influence_chance) [
+          set disagree-level disagree-level + ((random 50 + 1) * templinks)
+        ]
+      ]
     ]
   ]
-  ask influencers with [medium = 1 or medium = 2 and message = 1][
-    rt random 360
-    fd 5
-    ask audiences in-radius 20 [
-      set agree-level agree-level + 25.5
+
+
+  ; F2F every two ticks
+
+  let maxnearby audiences with-max [nearby]
+
+  if (ticks mod 2 = 0) [
+    ask influencers with [medium = 1 or medium = 2 and message = 1][
+      face one-of maxnearby
+      fd 1
+      ask audiences in-radius 20 [
+        if (random 101 < influence_chance) [
+          set agree-level agree-level + ((random 5 + 1) * (templinks + 10)) ; 10 as bonus for being f2f
+        ]
+      ]
     ]
   ]
-  ask influencers with [medium = 1 or medium = 2 and message = 0][
-    rt random 360
-    fd 5
-    ask audiences in-radius 20 [
-      set disagree-level disagree-level + 25.5
+
+
+  if (ticks mod 2 = 0) [
+    ask influencers with [medium = 1 or medium = 2 and message = 0][
+      face one-of maxnearby
+      fd 1
+      ask audiences in-radius 20 [
+        if (random 101 < influence_chance) [
+          set disagree-level disagree-level + ((random 5 + 1) * (templinks + 10))
+        ]
+      ]
     ]
   ]
+
   ask audiences [
     ifelse ticks = 0 [set color white] [
     let level agree-level - disagree-level + 100
-      set color scale-color green level 0 510 ]
+      set color scale-color white level 0 510 ]
+
+    ; Threshold
+
+    if (agree-level >= agree-threshold) [
+      set temp -1
+      ask influencers with [message = 1] [
+        if (random 101 < link_chance) [
+          create-links-with audiences with [temp = -1] [
+            set color [0 0 255 25]
+          ]
+        ]
+      ]
+      set temp 0
+      set agree-threshold agree-threshold + 30 ; Milestone/Threshold increases by 30
+    ]
+
+    if (disagree-level >= disagree-threshold) [
+      set temp -1
+      ask influencers with [message = 0] [
+        if (random 101 < link_chance) [
+          create-links-with audiences with [temp = -1] [
+            set color [0 0 255 25]
+          ]
+        ]
+      ]
+      set temp 0
+      set disagree-threshold disagree-threshold + 30
+    ]
   ]
 end
 
@@ -222,10 +298,10 @@ ticks
 30.0
 
 BUTTON
-29
-52
-92
-85
+36
+53
+99
+86
 NIL
 setup
 NIL
@@ -264,7 +340,7 @@ social_media_influencers
 social_media_influencers
 0
 100
-5.0
+1.0
 1
 1
 NIL
@@ -353,7 +429,7 @@ f2f_influencers
 f2f_influencers
 1
 100
-5.0
+2.0
 1
 1
 NIL
@@ -368,7 +444,7 @@ mixed_influencers
 mixed_influencers
 0
 100
-5.0
+1.0
 1
 1
 NIL
@@ -433,7 +509,7 @@ Starting_Population
 Starting_Population
 0
 1000
-1000.0
+96.0
 1
 1
 NIL
@@ -448,7 +524,22 @@ link_chance
 link_chance
 0
 100
-5.0
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+23
+422
+195
+455
+influence_chance
+influence_chance
+0
+100
+50.0
 1
 1
 NIL
