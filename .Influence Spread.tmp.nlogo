@@ -81,7 +81,7 @@ to go
     set nearby count audiences in-radius 20
   ]
 
-  wait 0.0
+  wait 0.03
 
   tick
 end
@@ -263,7 +263,7 @@ to influence
 end
 
 to remove-audience
-  ask audiences with [agree-level >= 255 or disagree-level >= 255] [die]
+  ask audiences with [agree-level >= 500 or disagree-level >= 500] [die]
 end
 
 to-report coin-flip?
@@ -524,7 +524,7 @@ link_chance
 link_chance
 0
 100
-30.0
+29.0
 1
 1
 NIL
@@ -537,6 +537,51 @@ SLIDER
 455
 influence_chance
 influence_chance
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+12
+464
+215
+497
+social_media_influencers_disagree
+social_media_influencers_disagree
+0
+100
+52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+13
+501
+200
+534
+f2f_influencers_disagree
+f2f_influencers_disagree
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+544
+211
+577
+mixed_influencers_disagree
+mixed_influencers_disagree
 0
 100
 50.0
