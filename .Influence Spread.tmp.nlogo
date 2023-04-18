@@ -238,7 +238,7 @@ to move-audience
 end
 
 to influence
-  ; Broadcast every 7 ticks
+  ; Broadcast every  ticks
   if (ticks mod 7 = 0) [
     ask influencers with [medium = 2 or medium = 0 and message = 1] [
       set templinks count my-links
@@ -261,7 +261,7 @@ to influence
   ]
 
 
-  ; F2F every 5 ticks
+  ; F2F every two ticks
 
   let maxnearby audiences with-max [nearby]
 
