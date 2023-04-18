@@ -278,12 +278,12 @@ to remove-audience
       (disagree-level > agree-level) [
         set disagree-total disagree-total + 1
         set disagree-advantage disagree-advantage + (disagree-level - agree-level)
-        set disagree-advantage-average (disagree-advantage / disagree-total) / 5
+        set disagree-advantage-average (disagree-advantage / disagree-total)
       ]
       (agree-level > disagree-level) [
         set agree-total agree-total + 1
         set agree-advantage agree-advantage + (agree-level - disagree-level)
-        set agree-advantage-average (agree-advantage / agree-total) / 5
+        set agree-advantage-average (agree-advantage / agree-total)s
       ]
       [
         set both-messages both-messages + 1
