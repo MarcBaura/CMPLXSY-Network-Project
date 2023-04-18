@@ -221,8 +221,6 @@ to move-audience
 end
 
 to influence
-  let f2f_movement 5
-
   ; Broadcast every 10 ticks
   if (ticks mod 10 = 0) [
     ask influencers with [medium = 2 or medium = 0 and message = 1] [
@@ -262,11 +260,11 @@ to influence
     ]
   ]
 
-
+  ; Move F2F
   if (ticks mod 2 = 0) [
     ask influencers with [medium = 1 or medium = 2 and message = 0][
       face one-of maxnearby
-      fd 1
+      fd f2f_movement_distance
       ask audiences in-radius 20 [
         if (random 101 < influence_chance) [
           set disagree-level disagree-level + ((random 5 + 1) * (templinks + 10))
@@ -421,21 +419,6 @@ count influencers with [message = 0 and medium = 1]
 1
 11
 
-SLIDER
-1028
-593
-1200
-626
-max_social_media_friends
-max_social_media_friends
-0
-100
-16.0
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
 1042
 312
@@ -500,25 +483,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-20
-271
+8
+250
 192
-304
-movement-speed
-movement-speed
-0
+283
+f2f_movement_distance
+f2f_movement_distance
+1
 100
-49.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-20
-343
-192
-376
+15
+296
+187
+329
 Starting_Population
 Starting_Population
 0
@@ -531,59 +514,14 @@ HORIZONTAL
 
 SLIDER
 20
-379
+205
 192
-412
+238
 link_chance
 link_chance
 0
 100
 32.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-23
-422
-195
-455
-influence_chance
-influence_chance
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-832
-630
-1019
-663
-f2f_influencers_disagree
-f2f_influencers_disagree
-0
-100
-52.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-827
-673
-1030
-706
-mixed_influencers_disagree
-mixed_influencers_disagree
-0
-100
-81.0
 1
 1
 NIL
@@ -690,7 +628,7 @@ INPUTBOX
 117
 742
 agree_social_media_influencers
-1.0
+12.0
 1
 0
 Number
@@ -712,7 +650,7 @@ INPUTBOX
 244
 742
 disagree_social_media_influencers
-2.0
+0.0
 1
 0
 Number
@@ -754,7 +692,7 @@ INPUTBOX
 379
 742
 agree_f2f_influencers
-3.0
+0.0
 1
 0
 Number
@@ -765,7 +703,7 @@ INPUTBOX
 477
 742
 disagree_f2f_influencers
-4.0
+0.0
 1
 0
 Number
@@ -807,7 +745,7 @@ INPUTBOX
 623
 743
 agree_mixed_influencers
-5.0
+9.0
 1
 0
 Number
@@ -818,7 +756,7 @@ INPUTBOX
 744
 743
 disagree_mixed_influencers
-6.0
+12.0
 1
 0
 Number
@@ -920,15 +858,15 @@ Unused sliders
 1
 
 SLIDER
-819
-592
-1022
-625
-social_media_influencers_disagree
-social_media_influencers_disagree
+17
+341
+189
+374
+influence_chance
+influence_chance
 0
 100
-53.0
+50.0
 1
 1
 NIL
@@ -944,6 +882,66 @@ number_of_audiences
 1
 100
 52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+819
+592
+1022
+625
+social_media_influencers_disagree
+social_media_influencers_disagree
+0
+100
+53.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+827
+673
+1030
+706
+mixed_influencers_disagree
+mixed_influencers_disagree
+0
+100
+81.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+832
+630
+1019
+663
+f2f_influencers_disagree
+f2f_influencers_disagree
+0
+100
+52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1028
+593
+1200
+626
+max_social_media_friends
+max_social_media_friends
+0
+100
+16.0
 1
 1
 NIL

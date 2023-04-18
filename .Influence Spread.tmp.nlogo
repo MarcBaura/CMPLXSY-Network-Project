@@ -321,6 +321,7 @@ to remove-audience
         set agree-advantage agree-advantage + (agree-level - disagree-level)
         set agree-advantage-average (agree-advantage / agree-total)
       ]
+
       [
         set both-messages both-messages + 1
      ])
@@ -409,36 +410,21 @@ NIL
 HORIZONTAL
 
 MONITOR
-1010
-369
-1087
-414
+1011
+363
+1088
+408
 Disagree f2f
 count influencers with [message = 0 and medium = 1]
 2
 1
 11
 
-SLIDER
-1028
-593
-1200
-626
-max_social_media_friends
-max_social_media_friends
-0
-100
-16.0
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
-1042
-312
-1200
-358
+1043
+306
+1201
+352
 Disagree advantage average
 disagree-advantage-average
 17
@@ -446,10 +432,10 @@ disagree-advantage-average
 11
 
 MONITOR
-784
-314
-928
-359
+785
+308
+929
+353
 Agree advantage average
 agree-advantage-average
 17
@@ -457,10 +443,10 @@ agree-advantage-average
 11
 
 MONITOR
-931
-314
-1039
-359
+932
+308
+1040
+353
 Equally influenced
 both-messages
 17
@@ -498,25 +484,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-20
-271
-204
-304
+8
+250
+192
+283
 f2f_movement_distance
 f2f_movement_distance
 1
 100
-49.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-20
-343
-192
-376
+15
+296
+187
+329
 Starting_Population
 Starting_Population
 0
@@ -528,60 +514,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-18
-211
-190
-244
+20
+205
+192
+238
 link_chance
 link_chance
 0
 100
 32.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-23
-422
-195
-455
-influence_chance
-influence_chance
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-832
-630
-1019
-663
-f2f_influencers_disagree
-f2f_influencers_disagree
-0
-100
-52.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-827
-673
-1030
-706
-mixed_influencers_disagree
-mixed_influencers_disagree
-0
-100
-81.0
 1
 1
 NIL
@@ -608,10 +549,10 @@ Agree stats
 1
 
 MONITOR
-805
-93
-950
-139
+806
+87
+951
+133
 Fully influenced (Agree)
 agree-total
 17
@@ -619,10 +560,10 @@ agree-total
 11
 
 MONITOR
-1035
-92
-1195
-138
+1036
+86
+1196
+132
 Fully influenced (Disagree)
 disagree-total
 17
@@ -647,10 +588,10 @@ NIL
 1
 
 PLOT
-1021
-151
-1199
-301
+1022
+145
+1200
+295
 Disagree advantage average
 NIL
 NIL
@@ -665,10 +606,10 @@ PENS
 "default" 1.0 0 -5298144 true "" "plot disagree-advantage-average"
 
 PLOT
-787
-152
-949
-302
+788
+146
+950
+296
 Agree advantage average
 NIL
 NIL
@@ -688,7 +629,7 @@ INPUTBOX
 117
 742
 agree_social_media_influencers
-1.0
+12.0
 1
 0
 Number
@@ -710,7 +651,7 @@ INPUTBOX
 244
 742
 disagree_social_media_influencers
-2.0
+0.0
 1
 0
 Number
@@ -752,7 +693,7 @@ INPUTBOX
 379
 742
 agree_f2f_influencers
-3.0
+0.0
 1
 0
 Number
@@ -763,7 +704,7 @@ INPUTBOX
 477
 742
 disagree_f2f_influencers
-4.0
+0.0
 1
 0
 Number
@@ -805,7 +746,7 @@ INPUTBOX
 623
 743
 agree_mixed_influencers
-5.0
+9.0
 1
 0
 Number
@@ -816,7 +757,7 @@ INPUTBOX
 744
 743
 disagree_mixed_influencers
-6.0
+12.0
 1
 0
 Number
@@ -842,10 +783,10 @@ TEXTBOX
 1
 
 MONITOR
-857
-368
-950
-413
+858
+362
+951
+407
 Agree soc med
 count influencers with [message = 1 and medium = 0]
 17
@@ -853,10 +794,10 @@ count influencers with [message = 1 and medium = 0]
 11
 
 MONITOR
-783
-367
-849
-412
+784
+361
+850
+406
 Agree f2f
 count influencers with [message = 1 and medium = 1]
 17
@@ -864,10 +805,10 @@ count influencers with [message = 1 and medium = 1]
 11
 
 MONITOR
-1090
-367
-1200
-412
+1091
+361
+1201
+406
 Disagree soc med
 count influencers with [message = 0 and medium = 0]
 17
@@ -875,10 +816,10 @@ count influencers with [message = 0 and medium = 0]
 11
 
 MONITOR
-809
-422
-891
-467
+810
+416
+892
+461
 Agree mixed
 count influencers with [message = 1 and medium = 2]
 17
@@ -886,10 +827,10 @@ count influencers with [message = 1 and medium = 2]
 11
 
 MONITOR
-1039
-421
-1136
-466
+1040
+415
+1137
+460
 Disagree mixed
 count influencers with [message = 0 and medium = 2]
 17
@@ -908,14 +849,44 @@ count audiences
 11
 
 TEXTBOX
-855
-562
-1005
-580
+850
+570
+1000
+588
 Unused sliders
 11
 0.0
 1
+
+SLIDER
+17
+341
+189
+374
+influence_chance
+influence_chance
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+839
+713
+1011
+746
+number_of_audiences
+number_of_audiences
+1
+100
+52.0
+1
+1
+NIL
+HORIZONTAL
 
 SLIDER
 819
@@ -933,15 +904,45 @@ NIL
 HORIZONTAL
 
 SLIDER
-839
-713
-1011
-746
-number_of_audiences
-number_of_audiences
+827
+673
+1030
+706
+mixed_influencers_disagree
+mixed_influencers_disagree
+0
+100
+81.0
 1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+832
+630
+1019
+663
+f2f_influencers_disagree
+f2f_influencers_disagree
+0
 100
 52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1028
+593
+1200
+626
+max_social_media_friends
+max_social_media_friends
+0
+100
+16.0
 1
 1
 NIL
