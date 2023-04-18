@@ -238,7 +238,7 @@ to move-audience
 end
 
 to influence
-  ; Broadcast every  ticks
+  ; Broadcast every 7 ticks
   if (ticks mod 7 = 0) [
     ask influencers with [medium = 2 or medium = 0 and message = 1] [
       set templinks count my-links
@@ -261,7 +261,7 @@ to influence
   ]
 
 
-  ; F2F every two ticks
+  ; F2F every 5 ticks
 
   let maxnearby audiences with-max [nearby]
 
@@ -282,7 +282,7 @@ to influence
     ask influencers with [medium = 1 or medium = 2 and message = 0][
       face one-of maxnearby
       fd f2f_movement_distance
-      ask audiences in-radius 20 [
+      ask audiences in-radius  [
         if (random 101 < influence_chance) [
           set disagree-level disagree-level + ((random 5 + 1) * (templinks + 10))
         ]
@@ -647,7 +647,7 @@ INPUTBOX
 117
 742
 agree_social_media_influencers
-0.0
+100.0
 1
 0
 Number
@@ -701,7 +701,7 @@ SWITCH
 652
 unequal_f2f_influencers?
 unequal_f2f_influencers?
-0
+1
 1
 -1000
 
@@ -754,7 +754,7 @@ SWITCH
 654
 unequal_mixed_influencers?
 unequal_mixed_influencers?
-0
+1
 1
 -1000
 
