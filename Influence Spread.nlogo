@@ -146,29 +146,67 @@ end
 
 to become-influencer
   let currentCount 0
-  let social max-n-of (social_media_influencers * 2) audiences [count my-links]
+  let social 0
+  (ifelse
+    (unequal_social_media_influencers?)
+    [ set social max-n-of (disagree_social_media_influencers + agree_social_media_influencers) audiences [count my-links] ]
+    [ set social max-n-of (social_media_influencers * 2) audiences [count my-links] ]
+  )
   ask social [
     set breed influencers
-    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
     set medium 0
     set label medium
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+
+    if (unequal_social_media_influencers?) [
+      if (count influencers with [message = 0 and medium = 0] > disagree_social_media_influencers) [ set message 1 set color blue]
+      if (count influencers with [message = 1 and medium = 0] > agree_social_media_influencers) [ set message 0 set color red]
+    ]
+
     set currentCount currentCount + 1
   ]
-  let mixed max-n-of (mixed_influencers * 2) audiences [count my-links]
+
+
   set currentCount 0
+  let mixed 0
+  (ifelse
+    (unequal_mixed_influencers?)
+    [ set mixed max-n-of (disagree_mixed_influencers + agree_mixed_influencers) audiences [count my-links] ]
+    [ set mixed max-n-of (mixed_influencers * 2) audiences [count my-links] ]
+  )
   ask mixed [
     set breed influencers
-    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
     set medium 2
     set label medium
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+
+    if (unequal_mixed_influencers?) [
+      if (count influencers with [message = 0 and medium = 2] > disagree_mixed_influencers) [ set message 1 set color blue]
+      if (count influencers with [message = 1 and medium = 2] > agree_mixed_influencers) [ set message 0 set color red]
+    ]
+
     set currentCount currentCount + 1
   ]
+
+
   set currentCount 0
-  ask n-of (f2f_influencers * 2) audiences [
+  let f2f_count 0
+  (ifelse
+    (unequal_f2f_influencers?)
+    [ set f2f_count agree_f2f_influencers + disagree_f2f_influencers ]
+    [ set f2f_count f2f_influencers * 2 ]
+  )
+
+  ask n-of (f2f_count) audiences [
     set breed influencers
-    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
     set medium 1
     set label medium
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+
+    if (unequal_f2f_influencers?) [
+      if (count influencers with [message = 0 and medium = 1] > disagree_f2f_influencers) [ set message 1 set color blue]
+      if (count influencers with [message = 1 and medium = 1] > agree_f2f_influencers) [ set message 0 set color red]
+    ]
     set currentCount currentCount + 1
   ]
 
@@ -381,19 +419,19 @@ number_of_audiences
 number_of_audiences
 1
 100
-51.0
+52.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-858
-640
-997
-685
+813
+413
+1123
+458
 NIL
-number_of_audiences
+count influencers with [medium = 1 and message = 0]
 2
 1
 11
@@ -407,7 +445,7 @@ max_social_media_friends
 max_social_media_friends
 0
 100
-15.0
+16.0
 1
 1
 NIL
@@ -425,10 +463,10 @@ disagree-advantage-average
 11
 
 MONITOR
-800
-283
-944
-328
+804
+280
+948
+325
 Agree advantage average
 agree-advantage-average
 17
@@ -436,10 +474,10 @@ agree-advantage-average
 11
 
 MONITOR
-1004
-398
-1147
-443
+920
+341
+1063
+386
 Equally influenced
 both-messages
 17
@@ -455,7 +493,7 @@ f2f_influencers
 f2f_influencers
 1
 100
-2.0
+7.0
 1
 1
 NIL
@@ -470,17 +508,17 @@ mixed_influencers
 mixed_influencers
 0
 100
-1.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-710
-690
-999
-897
+860
+668
+1149
+875
 count_each_influencers
 Count
 Steps
@@ -520,7 +558,7 @@ link-chance
 link-chance
 1
 100
-62.0
+64.0
 1
 1
 NIL
@@ -535,7 +573,7 @@ Starting_Population
 Starting_Population
 0
 1000
-96.0
+101.0
 1
 1
 NIL
@@ -550,7 +588,7 @@ link_chance
 link_chance
 0
 100
-29.0
+32.0
 1
 1
 NIL
@@ -580,7 +618,7 @@ social_media_influencers_disagree
 social_media_influencers_disagree
 0
 100
-52.0
+53.0
 1
 1
 NIL
@@ -595,7 +633,7 @@ f2f_influencers_disagree
 f2f_influencers_disagree
 0
 100
-50.0
+52.0
 1
 1
 NIL
@@ -617,10 +655,10 @@ NIL
 HORIZONTAL
 
 PLOT
-791
-395
-991
-545
+896
+492
+1096
+642
 Uninfluenced audiences
 NIL
 NIL
@@ -728,6 +766,165 @@ false
 "" ""
 PENS
 "default" 1.0 0 -14454117 true "" "plot agree-advantage-average"
+
+INPUTBOX
+9
+695
+108
+755
+agree_social_media_influencers
+3.0
+1
+0
+Number
+
+SWITCH
+10
+631
+233
+664
+unequal_social_media_influencers?
+unequal_social_media_influencers?
+1
+1
+-1000
+
+INPUTBOX
+124
+695
+235
+755
+disagree_social_media_influencers
+5.0
+1
+0
+Number
+
+TEXTBOX
+14
+677
+119
+695
+# of Agree soc med
+11
+94.0
+1
+
+TEXTBOX
+128
+675
+246
+693
+# of Disagree soc med
+11
+14.0
+1
+
+SWITCH
+280
+632
+475
+665
+unequal_f2f_influencers?
+unequal_f2f_influencers?
+0
+1
+-1000
+
+INPUTBOX
+278
+695
+370
+755
+agree_f2f_influencers
+3.0
+1
+0
+Number
+
+INPUTBOX
+382
+695
+468
+755
+disagree_f2f_influencers
+3.0
+1
+0
+Number
+
+TEXTBOX
+283
+674
+367
+692
+# of Agree f2f
+11
+94.0
+1
+
+TEXTBOX
+386
+673
+482
+691
+# of Disagree f2f
+11
+14.0
+1
+
+SWITCH
+523
+634
+734
+667
+unequal_mixed_influencers?
+unequal_mixed_influencers?
+1
+1
+-1000
+
+INPUTBOX
+519
+696
+614
+756
+agree_mixed_influencers
+0.0
+1
+0
+Number
+
+INPUTBOX
+630
+697
+734
+757
+disagree_mixed_influencers
+0.0
+1
+0
+Number
+
+TEXTBOX
+524
+675
+612
+693
+# of Agree mixed
+11
+94.0
+1
+
+TEXTBOX
+637
+677
+738
+695
+# of Disagree mixed
+11
+14.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
