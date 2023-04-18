@@ -3,6 +3,11 @@ breed [influencers influencer]
 ; same with audiences?
 breed [audiences audience]
 
+globals [
+  agree-total
+  disagree-total
+]
+
 audiences-own [
   temp
   templinks
@@ -263,7 +268,11 @@ to influence
 end
 
 to remove-audience
-  ask audiences with [agree-level >= 500 or disagree-level >= 500] [die]
+  ask audiences with [agree-level >= 500 or disagree-level >= 500] [
+    ifelse (disagree-level > agree-level) [set disagree-total disagree-total + 1]
+    [set agree-total agree-total + 1]
+    die
+  ]
 end
 
 to-report coin-flip?
@@ -362,10 +371,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-931
-69
-1070
-114
+962
+377
+1101
+422
 NIL
 number_of_audiences
 2
@@ -388,10 +397,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-783
-20
-925
-65
+813
+328
+955
+373
 social_media_influencers
 count influencers with [color = cyan]
 17
@@ -399,10 +408,10 @@ count influencers with [color = cyan]
 11
 
 MONITOR
-930
-19
-1068
-64
+960
+327
+1098
+372
 mixed_influencers
 count influencers with [color = red]
 17
@@ -410,10 +419,10 @@ count influencers with [color = red]
 11
 
 MONITOR
-783
-70
-926
-115
+813
+378
+956
+423
 f2f_influencers
 count influencers with [color = lime]
 17
@@ -451,10 +460,10 @@ NIL
 HORIZONTAL
 
 PLOT
-783
-119
-1072
-326
+813
+427
+1102
+634
 count_each_influencers
 Count
 Steps
@@ -589,6 +598,66 @@ mixed_influencers_disagree
 1
 NIL
 HORIZONTAL
+
+PLOT
+896
+524
+1096
+674
+Fully influenced count
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
+
+TEXTBOX
+1073
+30
+1167
+50
+Disagree stats\n
+12
+14.0
+0
+
+TEXTBOX
+798
+29
+888
+49
+Agree stats
+12
+94.0
+1
+
+MONITOR
+796
+59
+941
+105
+Fully influenced (Agree)
+agree-total
+17
+1
+11
+
+MONITOR
+1027
+57
+1187
+103
+Fully influenced (Disagree)
+disagree-total
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -3,6 +3,16 @@ breed [influencers influencer]
 ; same with audiences?
 breed [audiences audience]
 
+globals [
+  agree-total
+  disagree-total
+  agree-advantage      ; difference of agree-level and disagree-level (when agree-level >)
+  agree-advantage-average
+  disagree-advantage   ; when disagree-level >
+  disagree-advantage-average
+  both-messages
+]
+
 audiences-own [
   temp
   templinks
@@ -229,7 +239,7 @@ to influence
 
   ask audiences [
     ifelse ticks = 0 [set color white] [
-    let level agree-level - disagree-level + 100
+    let level agree-level - disagree-level
       set color scale-color white level 0 510 ]
 
     ; Threshold
@@ -263,7 +273,23 @@ to influence
 end
 
 to remove-audience
-  ask audiences with [agree-level >= 500 or disagree-level >= 500] [die]
+  ask audiences with [agree-level >= 500 or disagree-level >= 500] [
+    (ifelse
+      (disagree-level > agree-level) [
+        set disagree-total disagree-total + 1
+        set disagree-advantage disagree-advantage + (disagree-level - agree-level)
+        set disagree-advantage-average (disagree-advantage / disagree-total) / 5
+      ]
+      (agree-level > disagree-level) [
+        set agree-total agree-total + 1
+        set agree-advantage agree-advantage + (agree-level - disagree-level)
+        set agree-advantage-average (agree-advantage / agree-total) / 5
+      ]
+      [
+        set both-messages both-messages + 1
+     ])
+    die
+  ]
 end
 
 to-report coin-flip?
@@ -298,10 +324,10 @@ ticks
 30.0
 
 BUTTON
-36
-53
-99
-86
+72
+12
+135
+45
 NIL
 setup
 NIL
@@ -315,9 +341,9 @@ NIL
 1
 
 BUTTON
-116
+118
 53
-179
+181
 86
 NIL
 go
@@ -340,7 +366,7 @@ social_media_influencers
 social_media_influencers
 0
 100
-1.0
+2.0
 1
 1
 NIL
@@ -355,17 +381,17 @@ number_of_audiences
 number_of_audiences
 1
 100
-50.0
+51.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-931
-69
-1070
-114
+858
+640
+997
+685
 NIL
 number_of_audiences
 2
@@ -388,34 +414,34 @@ NIL
 HORIZONTAL
 
 MONITOR
-783
-20
-925
-65
-social_media_influencers
-count influencers with [color = cyan]
+1034
+278
+1192
+324
+Disagree advantage average
+disagree-advantage-average
 17
 1
 11
 
 MONITOR
-930
-19
-1068
-64
-mixed_influencers
-count influencers with [color = red]
+800
+283
+944
+328
+Agree advantage average
+agree-advantage-average
 17
 1
 11
 
 MONITOR
-783
-70
-926
-115
-f2f_influencers
-count influencers with [color = lime]
+1004
+398
+1147
+443
+Equally influenced
+both-messages
 17
 1
 11
@@ -451,10 +477,10 @@ NIL
 HORIZONTAL
 
 PLOT
-783
-119
-1072
-326
+710
+690
+999
+897
 count_each_influencers
 Count
 Steps
@@ -589,6 +615,119 @@ mixed_influencers_disagree
 1
 NIL
 HORIZONTAL
+
+PLOT
+791
+395
+991
+545
+Uninfluenced audiences
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count audiences"
+
+TEXTBOX
+1073
+29
+1167
+49
+Disagree stats\n
+12
+14.0
+0
+
+TEXTBOX
+846
+28
+936
+48
+Agree stats
+12
+94.0
+1
+
+MONITOR
+805
+58
+950
+104
+Fully influenced (Agree)
+agree-total
+17
+1
+11
+
+MONITOR
+1035
+57
+1195
+103
+Fully influenced (Disagree)
+disagree-total
+17
+1
+11
+
+BUTTON
+22
+54
+98
+88
+go once
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+1027
+116
+1199
+266
+Disagree advantage average
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -5298144 true "" "plot disagree-advantage-average"
+
+PLOT
+787
+117
+964
+267
+Agree advantage average
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -14454117 true "" "plot agree-advantage-average"
 
 @#$#@#$#@
 ## WHAT IS IT?
