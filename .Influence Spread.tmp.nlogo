@@ -171,15 +171,20 @@ to become-influencer
   let mixed 0
   (ifelse
     (unequal_mixed_influencers?)
-    [ set mixed max-n-of (disagree__influencers + agree_social_media_influencers) audiences [count my-links] ]
-    [ set social max-n-of (social_media_influencers * 2) audiences [count my-links] ]
+    [ set mixed max-n-of (disagree_mixed_influencers + agree_mixed_influencers) audiences [count my-links] ]
+    [ set mixed max-n-of (mixed_influencers * 2) audiences [count my-links] ]
   )
-  let mixed max-n-of (mixed_influencers * 2) audiences [count my-links]
   ask mixed [
     set breed influencers
-    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
     set medium 2
     set label medium
+    (ifelse (currentCount mod 2 = 0) [set message 0 set color red] [set message 1 set color blue])
+
+    if (unequal_mixed_influencers?) [
+      if (count influencers with [message = 0 and medium = 2] > disagree_mixed_influencers) [ set message 1 set color blue]
+      if (count influencers with [message = 1 and medium = 2] > agree_mixed_influencers) [ set message 0 set color red]
+    ]
+
     set currentCount currentCount + 1
   ]
 
@@ -216,8 +221,6 @@ to move-audience
 end
 
 to influence
-  let f2f_movement 5
-
   ; Broadcast every 10 ticks
   if (ticks mod 10 = 0) [
     ask influencers with [medium = 2 or medium = 0 and message = 1] [
@@ -257,11 +260,11 @@ to influence
     ]
   ]
 
-
+  ; Move F2F
   if (ticks mod 2 = 0) [
     ask influencers with [medium = 1 or medium = 2 and message = 0][
       face one-of maxnearby
-      fd 1
+      fd f2f_movement_distance
       ask audiences in-radius 20 [
         if (random 101 < influence_chance) [
           set disagree-level disagree-level + ((random 5 + 1) * (templinks + 10))
@@ -405,37 +408,22 @@ social_media_influencers
 NIL
 HORIZONTAL
 
-SLIDER
-20
-201
-192
-234
-number_of_audiences
-number_of_audiences
-1
-100
-52.0
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
-813
-413
-1123
-458
-NIL
-count influencers with [medium = 1 and message = 0]
+1010
+369
+1087
+414
+Disagree f2f
+count influencers with [message = 0 and medium = 1]
 2
 1
 11
 
 SLIDER
-20
-236
-192
-269
+1028
+593
+1200
+626
 max_social_media_friends
 max_social_media_friends
 0
@@ -447,10 +435,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1034
-278
-1192
-324
+1042
+312
+1200
+358
 Disagree advantage average
 disagree-advantage-average
 17
@@ -458,10 +446,10 @@ disagree-advantage-average
 11
 
 MONITOR
-804
-280
-948
-325
+784
+314
+928
+359
 Agree advantage average
 agree-advantage-average
 17
@@ -469,10 +457,10 @@ agree-advantage-average
 11
 
 MONITOR
-920
-341
-1063
-386
+931
+314
+1039
+359
 Equally influenced
 both-messages
 17
@@ -509,51 +497,16 @@ mixed_influencers
 NIL
 HORIZONTAL
 
-PLOT
-860
-668
-1149
-875
-count_each_influencers
-Count
-Steps
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"social_media" 1.0 0 -11221820 true "" "plot count influencers with [color = cyan]"
-"f2f" 1.0 0 -13840069 true "" "plot count influencers with [color = lime]"
-"mixed" 1.0 0 -2674135 true "" "plot count influencers with [color = red]"
-
 SLIDER
 20
 271
-192
+204
 304
-movement-speed
-movement-speed
-0
+f2f_movement_distance
+f2f_movement_distance
+1
 100
 49.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-20
-308
-192
-341
-link-chance
-link-chance
-1
-100
-64.0
 1
 1
 NIL
@@ -568,17 +521,17 @@ Starting_Population
 Starting_Population
 0
 1000
-101.0
+325.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-20
-379
-192
-412
+18
+211
+190
+244
 link_chance
 link_chance
 0
@@ -605,25 +558,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-12
-464
-215
-497
-social_media_influencers_disagree
-social_media_influencers_disagree
-0
-100
-53.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-13
-501
-200
-534
+832
+630
+1019
+663
 f2f_influencers_disagree
 f2f_influencers_disagree
 0
@@ -635,43 +573,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-544
-211
-577
+827
+673
+1030
+706
 mixed_influencers_disagree
 mixed_influencers_disagree
 0
 100
-50.0
+81.0
 1
 1
 NIL
 HORIZONTAL
 
-PLOT
-896
-492
-1096
-642
-Uninfluenced audiences
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot count audiences"
-
 TEXTBOX
 1073
-29
+64
 1167
-49
+84
 Disagree stats\n
 12
 14.0
@@ -679,9 +599,9 @@ Disagree stats\n
 
 TEXTBOX
 846
-28
+63
 936
-48
+83
 Agree stats
 12
 94.0
@@ -689,9 +609,9 @@ Agree stats
 
 MONITOR
 805
-58
+93
 950
-104
+139
 Fully influenced (Agree)
 agree-total
 17
@@ -700,9 +620,9 @@ agree-total
 
 MONITOR
 1035
-57
+92
 1195
-103
+138
 Fully influenced (Disagree)
 disagree-total
 17
@@ -727,10 +647,10 @@ NIL
 1
 
 PLOT
-1027
-116
+1021
+151
 1199
-266
+301
 Disagree advantage average
 NIL
 NIL
@@ -746,9 +666,9 @@ PENS
 
 PLOT
 787
-117
-964
-267
+152
+949
+302
 Agree advantage average
 NIL
 NIL
@@ -763,21 +683,21 @@ PENS
 "default" 1.0 0 -14454117 true "" "plot agree-advantage-average"
 
 INPUTBOX
-9
-695
-108
-755
+18
+682
+117
+742
 agree_social_media_influencers
-3.0
+1.0
 1
 0
 Number
 
 SWITCH
-10
-631
-233
-664
+19
+618
+242
+651
 unequal_social_media_influencers?
 unequal_social_media_influencers?
 1
@@ -785,52 +705,52 @@ unequal_social_media_influencers?
 -1000
 
 INPUTBOX
-124
-695
-235
-755
+133
+682
+244
+742
 disagree_social_media_influencers
-5.0
+2.0
 1
 0
 Number
 
 TEXTBOX
-14
-677
-119
-695
+23
+664
+128
+682
 # of Agree soc med
 11
 94.0
 1
 
 TEXTBOX
-128
-675
-246
-693
+137
+662
+255
+680
 # of Disagree soc med
 11
 14.0
 1
 
 SWITCH
-280
-632
-475
-665
+289
+619
+484
+652
 unequal_f2f_influencers?
 unequal_f2f_influencers?
-0
+1
 1
 -1000
 
 INPUTBOX
-278
-695
-370
-755
+287
+682
+379
+742
 agree_f2f_influencers
 3.0
 1
@@ -838,41 +758,41 @@ agree_f2f_influencers
 Number
 
 INPUTBOX
-382
-695
-468
-755
+391
+682
+477
+742
 disagree_f2f_influencers
-3.0
+4.0
 1
 0
 Number
 
 TEXTBOX
-283
-674
-367
-692
+292
+661
+376
+679
 # of Agree f2f
 11
 94.0
 1
 
 TEXTBOX
-386
-673
-482
-691
+395
+660
+491
+678
 # of Disagree f2f
 11
 14.0
 1
 
 SWITCH
-523
-634
-734
-667
+532
+621
+743
+654
 unequal_mixed_influencers?
 unequal_mixed_influencers?
 1
@@ -880,46 +800,152 @@ unequal_mixed_influencers?
 -1000
 
 INPUTBOX
-519
-696
-614
-756
+528
+683
+623
+743
 agree_mixed_influencers
-0.0
+5.0
 1
 0
 Number
 
 INPUTBOX
-630
-697
-734
-757
+640
+683
+744
+743
 disagree_mixed_influencers
-0.0
+6.0
 1
 0
 Number
 
 TEXTBOX
-524
-675
-612
-693
+533
+662
+621
+680
 # of Agree mixed
 11
 94.0
 1
 
 TEXTBOX
-637
-677
-738
-695
+646
+664
+747
+682
 # of Disagree mixed
 11
 14.0
 1
+
+MONITOR
+857
+368
+950
+413
+Agree soc med
+count influencers with [message = 1 and medium = 0]
+17
+1
+11
+
+MONITOR
+783
+367
+849
+412
+Agree f2f
+count influencers with [message = 1 and medium = 1]
+17
+1
+11
+
+MONITOR
+1090
+367
+1200
+412
+Disagree soc med
+count influencers with [message = 0 and medium = 0]
+17
+1
+11
+
+MONITOR
+809
+422
+891
+467
+Agree mixed
+count influencers with [message = 1 and medium = 2]
+17
+1
+11
+
+MONITOR
+1039
+421
+1136
+466
+Disagree mixed
+count influencers with [message = 0 and medium = 2]
+17
+1
+11
+
+MONITOR
+920
+10
+1063
+55
+Uninfluenced audiences
+count audiences
+17
+1
+11
+
+TEXTBOX
+855
+562
+1005
+580
+Unused sliders
+11
+0.0
+1
+
+SLIDER
+819
+592
+1022
+625
+social_media_influencers_disagree
+social_media_influencers_disagree
+0
+100
+53.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+839
+713
+1011
+746
+number_of_audiences
+number_of_audiences
+1
+100
+52.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
