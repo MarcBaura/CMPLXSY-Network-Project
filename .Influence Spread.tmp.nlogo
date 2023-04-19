@@ -244,7 +244,7 @@ to influence
       set templinks count my-links
       ask link-neighbors with [breed = audiences] [
         if (random 101 < influence_chance) [
-          set agree-level agree-level + ((random 5 + 1) * templinks) ; Random val from 1-10 * Degree
+          set agree-level agree-level + ((random 5 + 1) * templinks) ; Random val from 1-1 * Degree
         ]
       ]
     ]
