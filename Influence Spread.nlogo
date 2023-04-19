@@ -103,7 +103,7 @@ to go
     set nearby count audiences in-radius 20
   ]
 
-  wait 0.03
+  wait 0.01
 
   tick
 end
@@ -254,7 +254,7 @@ to influence
     ask influencers with [medium = 2 or medium = 0 and message = 0] [
       ask link-neighbors with [breed = audiences] [
         if (random 101 < influence_chance) [
-          set disagree-level disagree-level + ((random 50 + 1) * templinks)
+          set disagree-level disagree-level + ((random 5 + 1) * templinks)
         ]
       ]
     ]
@@ -421,7 +421,7 @@ social_media_influencers
 social_media_influencers
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -480,7 +480,7 @@ f2f_influencers
 f2f_influencers
 1
 100
-7.0
+10.0
 1
 1
 NIL
@@ -495,7 +495,7 @@ mixed_influencers
 mixed_influencers
 0
 100
-0.0
+10.0
 1
 1
 NIL
@@ -525,7 +525,7 @@ Starting_Population
 Starting_Population
 0
 1000
-325.0
+310.0
 1
 1
 NIL
@@ -659,7 +659,7 @@ SWITCH
 651
 unequal_social_media_influencers?
 unequal_social_media_influencers?
-0
+1
 1
 -1000
 
