@@ -267,8 +267,6 @@ to influence
 
   if (ticks mod 5 = 0) [
     ask influencers with [medium = 1 or medium = 2 and message = 1][
-      face one-of maxnearby
-      fd 1
       ask audiences in-radius 10 [
         if (random 101 < influence_chance) [
           set agree-level agree-level + ((random 5 + 1) * (templinks + 10)) ; 10 as bonus for being f2f
@@ -277,11 +275,8 @@ to influence
     ]
   ]
 
-  ; Move F2F
   if (ticks mod 5 = 0) [
     ask influencers with [medium = 1 or medium = 2 and message = 0][
-      face one-of maxnearby
-      fd f2f_movement_distance
       ask audiences in-radius 10 [
         if (random 101 < influence_chance) [
           set disagree-level disagree-level + ((random 5 + 1) * (templinks + 10))
@@ -289,6 +284,19 @@ to influence
       ]
     ]
   ]
+
+  ; Move F2F
+  ask influencers with [medium = 1 or medium = 2 and message = 0] [
+    face one-of maxnearby
+    fd f2f_movement_distance
+  ]
+
+  ask influencers with [medium = 1 or medium = 2 and message = 1] [
+    face one-of maxnearby
+    fd f2f_movement_distance
+  ]
+
+
 
   ask audiences [
     ifelse ticks = 0 [set color white] [
@@ -329,6 +337,8 @@ end
 
 to remove-audience
   ask audiences with [agree-level >= 500 or disagree-level >= 500] [
+    output-print word "Disagree = " disagree-level
+    output-print word "Agree = " agree-level
     (ifelse
       (disagree-level > agree-level) [
         set disagree-total disagree-total + 1
@@ -421,7 +431,7 @@ social_media_influencers
 social_media_influencers
 0
 100
-10.0
+0.0
 1
 1
 NIL
@@ -480,7 +490,7 @@ f2f_influencers
 f2f_influencers
 1
 100
-10.0
+5.0
 1
 1
 NIL
@@ -495,7 +505,7 @@ mixed_influencers
 mixed_influencers
 0
 100
-10.0
+0.0
 1
 1
 NIL
@@ -525,7 +535,7 @@ Starting_Population
 Starting_Population
 0
 1000
-310.0
+317.0
 1
 1
 NIL
@@ -647,7 +657,7 @@ INPUTBOX
 117
 742
 agree_social_media_influencers
-100.0
+0.0
 1
 0
 Number
@@ -659,7 +669,7 @@ SWITCH
 651
 unequal_social_media_influencers?
 unequal_social_media_influencers?
-1
+0
 1
 -1000
 
@@ -669,7 +679,7 @@ INPUTBOX
 244
 742
 disagree_social_media_influencers
-1.0
+10.0
 1
 0
 Number
@@ -701,7 +711,7 @@ SWITCH
 652
 unequal_f2f_influencers?
 unequal_f2f_influencers?
-1
+0
 1
 -1000
 
@@ -711,7 +721,7 @@ INPUTBOX
 379
 742
 agree_f2f_influencers
-1.0
+10.0
 1
 0
 Number
@@ -722,7 +732,7 @@ INPUTBOX
 477
 742
 disagree_f2f_influencers
-5.0
+0.0
 1
 0
 Number
